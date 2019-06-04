@@ -3,7 +3,7 @@
 import os, random, math, string
 from random import randint
 from math import radians, sin, cos
-from psychopy import core, visual, event, gui, misc, data
+from psychopy import core, visual, event, gui, misc, data 
 
 def enterSubInfo(expName):
     """Brings up a GUI in which to enter all the subject info."""
@@ -19,7 +19,7 @@ def enterSubInfo(expName):
         core.quit()
     return expInfo
     
-def showInstructions(instructText1, instructText2, pos=[0,.3], waitKeys=True):
+def showInstructions(instructText1,instructText2,pos=[0,.3],waitKeys=True):
     """ Displays the experiment specific instructional/descriptive text. 
     The position/wrapWidth may need to be changed depending
     on the length of the text."""
@@ -35,7 +35,7 @@ def showInstructions(instructText1, instructText2, pos=[0,.3], waitKeys=True):
     else:
         pass
     
-def makeDataFile(subject, expName):
+def makeDataFile(subject,expName):
     """Make a text file to save data, will not overwrite existing data"""
     fileName = subject+'_'+expName 
     ext =''
@@ -46,10 +46,11 @@ def makeDataFile(subject, expName):
     dataFile = open(fileName+ext+'.xls', 'w')
     return dataFile
 
-def writeToFile(fileHandle, trial, sync=True):
+def writeToFile(fileHandle,trial,sync=True):
     """Writes a trial (a dictionary) to a fileHandle, in a specific order, given 
     by overall order (general variables that are always used) and experiment 
     specific variables (variables that vary based on what you're measuring)."""
+
     overallOrder = ['subject','subInitials','date','experimenter','totalTime','trialNum']
     overallOrder.extend(expVarOrder)
     
@@ -61,7 +62,7 @@ def writeToFile(fileHandle, trial, sync=True):
             line += item
             line += '\t'
         line += '\n'
-        
+    
     for item in overallOrder:
         line += str(trial[item])
         line += '\t'
@@ -86,8 +87,7 @@ def generateExperimental(throwOut=15):
     """Generates experimental trials."""
     
     # time before the red target appears
-    #choiceLatencies = [3,5,10,15,20,30,60]
-    choiceLatencies = [3,5]
+    choiceLatencies = [3,5,10,15,20,30,60]
     askConf = [0,1]
     
     # generate experimental trials
@@ -113,7 +113,6 @@ def addTrialVariables():
     trial['totalTime'] = expClock.getTime()
     trial['trialNum'] = trialNum + 1 #add 1 because index starts at 0
     trial['circlePositions'] = circlePositions
-    trial['squarePositions'] = squarePositions
     trial['response'] = response
     trial['responseTime'] = responseTime
     trial['choiceTime'] = choiceTime
@@ -145,28 +144,22 @@ def readySequence():
     win.flip()
     core.wait(.5)
 
-def presentStimuli(numCircles, askConf, latency='NA', training=False, numSquares=1):
+def presentStimuli(numCircles,askConf,latency='NA',training=False):
     """Draws non-overlapping letters in window for specified time."""
-
     #letterOptions = random.sample(string.ascii_uppercase,numCircles)
     colorOptions = ['Red','Gold','Lime','Fuchsia','Aqua','Coral']
     random.shuffle(colorOptions)
-    # TODO: Use the same color options, shuffle dynamic
-    squareColorOptions = ['Red','Gold','Lime','Fuchsia','Aqua','Coral']
-    random.shuffle(squareColorOptions)
 
     # create letter/masking circle stimuli
     circles = []
-    squares = []
     letters = []
     
-    # Draw circles on window
+    # fixed latency: instead of randomly selecting latency set it so
+    # the first two circles are always displayed using it
+    fixedLatency = 9
+    
     for circleNum in range(numCircles):
-        circles.append(visual.Circle(win, size=70, units='pix',fillColor=colorOptions[circleNum],lineColor=colorOptions[circleNum]))
-        
-    # Draw squares on window
-    for squareNum in range(numSquares):
-        squares.append(visual.Rect(win,units='pix',width=70,height=70,fillColor=squareColorOptions[squareNum],lineColor=squareColorOptions[squareNum]))
+        circles.append(visual.Circle(win,size=70,units='pix',fillColor=colorOptions[circleNum],lineColor=colorOptions[circleNum]))
         
     # distance that the 5 letters are from center
     centerDist = 150
@@ -182,27 +175,13 @@ def presentStimuli(numCircles, askConf, latency='NA', training=False, numSquares
                     tryAgain = True
                     break
                     
-    for squareNum,square in enumerate(squares):
-        tryAgain = True
-        while tryAgain:
-            circleAng = radians(randint(0,360))
-            square.pos = (centerDist*sin(circleAng),centerDist*cos(circleAng))
-            tryAgain = False      
-            for i in range(squareNum): 
-                if square.overlaps(circle[i]):
-                    tryAgain = True
-                    break
-                    
     if training==True: ##Training Trials
         response = 'NA'
         responseTime = 'NA'
-        confAnswer = 'NA'
                 
-        # draw all non-overlapping circles and squares
+        # draw all non-overlapping circles
         for circle in circles:
             circle.draw(win)
-        for square in squares:
-            square.draw(win)
         win.flip()
 
         choiceClock.reset()
@@ -214,21 +193,14 @@ def presentStimuli(numCircles, askConf, latency='NA', training=False, numSquares
         choiceTime = 'NA'
         
         # draw all non-overlapping circles for specified latency time
-        for n in range(latency):
+        for n in range(fixedLatency):
             for circle in circles:
                 circle.draw(win)
-            for square in squares:
-                square.draw(win)
             win.flip()
-        
-        centerCircle = visual.Circle(win,size=70,units='pix',pos=[0,0],fillColor=colorOptions[1],lineColor=colorOptions[1])
-                
-        for circle in circles:
-            #circle.fillColor='White'
-            circle.draw(win)
-        win.clearBuffer()
-        win.flip()
-        centerCircle.draw(win)
+            for x in range(latency):
+                centerCircle = visual.Circle(win,size=70,units='pix',pos=[0,0],fillColor=colorOptions[1],lineColor=colorOptions[1])
+                centerCircle.draw(win)
+            #win.flip()
         win.flip()
     
         responseClock.reset()
@@ -245,30 +217,19 @@ def presentStimuli(numCircles, askConf, latency='NA', training=False, numSquares
         else: 
             confAnswer = 'NA'
     
-    # store final positions of all circles and squares
+    # store final positions of all circles
     circlePositions = [str(circle.pos) for circle in circles]
-    squarePositions = [str(square.pos) for square in squares]
-    return circlePositions, squarePositions, response,responseTime,choiceTime,confAnswer,colorOptions
+    return circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions
 
 
 ## Define Experimental Variables ##
-expVarOrder = [
-'latency',
-'avgChoiceTime',
-'circlePositions',
-'squarePositions',
-'response',
-'responseTime',
-'choiceTime',
-'confAnswer',
-'colorOptions'
-]
+expVarOrder = ['latency','avgChoiceTime','circlePositions','response','responseTime','choiceTime','confAnswer','colorOptions']
 expInfo = enterSubInfo('Choice Experiment')
 dataFile = makeDataFile(expInfo['Subject'],expInfo['ExpTitle'])
 
-win = visual.Window([1920, 1080], color=[-1, -1, -1], fullscr=False, monitor='testMonitor')
-ready = visual.TextStim(win, text=u'Ready?', height=.3, color=[1,1,1])
-fixation = visual.TextStim(win, text='+', height=.07, color=[1,1,1])
+win = visual.Window([1920,1080],color=[-1,-1,-1],fullscr=False,monitor='testMonitor')
+ready = visual.TextStim(win,text=u'Ready?',height=.3,color=[1,1,1])
+fixation = visual.TextStim(win,text='+',height=.07,color=[1,1,1])
 quit = visual.TextStim(win,text='Quit experiment now (y/n)?',height=.1,color=[1,1,1])
 
 confQuestionText = u'On a scale from 1 to 5, how confident you are that this is your choice? (1= Not confident at all; 5= Extremely confident) '
@@ -331,7 +292,7 @@ practiceTrials = generateExperimental()
 
 for trialNum,trial in enumerate(practiceTrials):
     readySequence()
-    presentStimuli(1, trial['askConf'],trial['latency'])
+    presentStimuli(2,trial['askConf'],trial['latency'])
     
 ## Final Instructions ##
 text = 'Now the real experiment will begin. Remember that you can take as many breaks \
@@ -349,6 +310,6 @@ experimentalTrials = generateExperimental()
 
 for trialNum,trial in enumerate(experimentalTrials):
     readySequence()
-    circlePositions,squarePositions,response,responseTime,choiceTime,confAnswer,colorOptions = presentStimuli(1,trial['askConf'],trial['latency'])
+    circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions = presentStimuli(2,trial['askConf'],trial['latency'])
     addTrialVariables()
     writeToFile(dataFile,trial)
