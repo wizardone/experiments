@@ -118,6 +118,7 @@ def addTrialVariables():
     trial['totalTime'] = expClock.getTime()
     trial['trialNum'] = trialNum + 1 #add 1 because index starts at 0
     trial['circlePositions'] = circlePositions
+    trial['centerCircleColor'] = centerCircleColor
     trial['response'] = response
     trial['responseTime'] = responseTime
     trial['choiceTime'] = choiceTime
@@ -189,7 +190,7 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
         if t >= latency:
             centerCircle = visual.Circle(win,size=70,units='pix',pos=[0,0],fillColor=colorOptions[1],lineColor=colorOptions[1])
             centerCircle.draw(win)
-        if t >= 1.5:
+        if t >= latency:
             break
     win.flip()
             
@@ -210,11 +211,11 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
     
     # store final positions of all circles
     circlePositions = [str(circle.pos) for circle in circles]
-    return circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions
+    return circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions, centerCircle.fillColor
 
 
 ## Define Experimental Variables ##
-expVarOrder = ['latency','avgChoiceTime','circlePositions','response','responseTime','choiceTime','confAnswer','colorOptions']
+expVarOrder = ['latency','avgChoiceTime','circlePositions','response','responseTime','choiceTime','confAnswer','colorOptions', 'centerCircleColor']
 expInfo = enterSubInfo('Choice Experiment')
 dataFile = makeDataFile(expInfo['Subject'],expInfo['ExpTitle'])
 
@@ -301,6 +302,6 @@ experimentalTrials = generateExperimental()
 
 for trialNum,trial in enumerate(experimentalTrials):
     readySequence()
-    circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions = presentStimuli(2,trial['askConf'],trial['latency'])
+    circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions, centerCircleColor = presentStimuli(2,trial['askConf'],trial['latency'])
     addTrialVariables()
-    #writeToFile(dataFile,trial)
+    writeToFile(dataFile,trial)
