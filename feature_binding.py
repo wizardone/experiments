@@ -139,6 +139,7 @@ def readySequence():
 
 def presentStimuli():
     colorOptions = ['Red','Gold','Lime','Fuchsia','Aqua','Coral']
+    mouse = event.Mouse()
     
     circle = visual.Circle(win,size=70,pos = (-0.2, 0),units='pix',fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
     rect = visual.Rect(win,width=0.1,height=0.1,pos =(-0.1, 0),fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
@@ -158,7 +159,21 @@ def presentStimuli():
     cross.draw(win)
     win.flip()
     
-    response = event.waitKeys(keyList=['t','f','c'])
+    waitClick = True
+    while waitClick:
+        if sum(mouse.getPressed()) > 0:
+            waitClick = False
+            break
+    
+    if mouse.isPressedIn(circle):
+        print("Pressed in circle!!!")
+    if mouse.isPressedIn(rect):
+        print("Pressed in rect!!!")
+    if mouse.isPressedIn(star):
+        print("Pressed in star!!!")
+    if mouse.isPressedIn(triangle):
+        print("Pressed in triangle!!!")
+    #response = event.waitKeys(keyList=['t','f','c'])
 
 
 
