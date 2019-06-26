@@ -141,22 +141,29 @@ def presentStimuli():
     colorOptions = ['Red','Gold','Lime','Fuchsia','Aqua','Coral']
     mouse = event.Mouse()
     
-    circle = visual.Circle(win,size=70,pos = (-0.2, 0),units='pix',fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
-    rect = visual.Rect(win,width=0.1,height=0.1,pos =(-0.1, 0),fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
+    circle = visual.Circle(win, size=0.1, fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions),interpolate=False)
+    rect = visual.Rect(win,width=0.1,height=0.1,fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
     triangle = visual.ShapeStim(win=win, name='polygon',
         vertices=[[-(0.1, 0.1)[0]/2.0,-(0.1, 0.1)[1]/2.0], [+(0.1, 0.1)[0]/2.0,-(0.1, 0.1)[1]/2.0], [0,(0.1, 0.1)[1]/2.0]],
-        ori=0, pos=(0.3, 0),
+        ori=0,lineWidth=1, fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
+    cross = visual.ShapeStim(win=win, name='polygon_2', vertices='cross', size=(0.1, 0.1), ori=0,
         lineWidth=1, fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
-    cross = visual.ShapeStim(win=win, pos=(0.1, 0), name='polygon_2', vertices='cross', size=(0.1, 0.1), ori=0,
-        lineWidth=1, fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
-    star = visual.ShapeStim(win=win, pos=(0.2, 0), name='polygon_3', vertices='star7',size=(0.1, 0.1),ori=0, 
+    star = visual.ShapeStim(win=win, name='polygon_3', vertices='star7',size=(0.1, 0.1),ori=0, 
         lineWidth=1, fillColor=random.choice(colorOptions),lineColor=random.choice(colorOptions))
         
-    circle.draw(win)
-    rect.draw(win)
-    triangle.draw(win)
-    star.draw(win)
-    cross.draw(win)
+    # Create a list to hold all shapes
+    shapeOptions = [circle, rect, triangle, cross, star]
+    # Shuffle shape options
+    random.shuffle(shapeOptions)
+    # Iterate over shapes and draw
+    i = 0
+    xPos = -0.3
+    while i < 4:
+        shapeOptions[i].pos = (xPos, 0)
+        shapeOptions[i].draw(win)
+        xPos += 0.2
+        i += 1
+
     win.flip()
     
     waitClick = True
