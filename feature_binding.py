@@ -173,13 +173,42 @@ def presentStimuli():
             break
     
     if mouse.isPressedIn(circle):
-        print("Pressed in circle!!!")
+        chosenShape = circle
+        chosenColor = circle.fillColor
     if mouse.isPressedIn(rect):
-        print("Pressed in rect!!!")
+        chosenShape = rect
+        chosenColor = rect.fillColor
     if mouse.isPressedIn(star):
-        print("Pressed in star!!!")
+        chosenShape = star
+        chosenColor = star.fillColor
     if mouse.isPressedIn(triangle):
-        print("Pressed in triangle!!!")
+        chosenShape = triangle
+        chosenColor = triangle.fillColor
+    if mouse.isPressedIn(cross):
+        chosenShape = cross
+        chosenColor = cross.fillColor
+        
+    win.flip()
+
+    scenario = random.choice([1,2,3])
+    if scenario == 1:
+        # Scenario 1: change the color of the shape
+        colorOptions.remove(chosenShape.fillColor)
+        chosenShape.fillColor = random.choice(colorOptions)
+        chosenShape.pos = [0, 0]
+        chosenShape.draw(win)
+    elif scenario == 2:
+        # Scenario 2: change the shape and maintain the color
+        newShape = random.choice(shapeOptions)
+        newShape.fillColor = chosenColor
+        newShape.pos = [0, 0]
+        newShape.draw(win)
+    else:
+        chosenShape.pos = [0, 0]
+        chosenShape.draw(win)
+        
+    win.flip()
+    event.waitKeys(keyList=['t'])
     #response = event.waitKeys(keyList=['t','f','c'])
 
 
