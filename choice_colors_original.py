@@ -195,7 +195,6 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
             for n in range(fixedCirclesLatency):
                 if n >= latency:
                     centerCircle.draw(win)
-                    win.flip()
                 for circle in circles:
                     circle.draw(win)
                 win.flip()

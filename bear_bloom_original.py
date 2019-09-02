@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os, random, math, string
+import os, random, math, string, time
+from threading import Timer
 from random import randint
 from math import radians, sin, cos
-from psychopy import core, visual, event, gui, misc, data 
+from psychopy import core, clock, visual, event, gui, misc, data
+from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
+                                STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 
 def enterSubInfo(expName):
     """Brings up a GUI in which to enter all the subject info."""
@@ -88,6 +91,7 @@ def generateExperimental(throwOut=15):
     
     # time before the red target appears
     choiceLatencies = [3,5,10,15,20,30,60]
+    latenciesMilliseconds = [0.05, 0.083, 0.0166, 0.25, 0.33, 0.5, 1]
     askConf = [0,1]
     
     # generate experimental trials
@@ -95,9 +99,10 @@ def generateExperimental(throwOut=15):
     trials = []
     
     for rep in range(reps):
-        for latency in choiceLatencies:
+        # choiceLatencies was used here
+        for latency in latenciesMilliseconds:
             for asked in askConf:
-                trials.append({'latency':int(latency),'avgChoiceTime':'NA','askConf':asked})
+                trials.append({'latency':latency,'avgChoiceTime':'NA','askConf':asked})
             
     # randomly shuffle only experimental trials
     random.shuffle(trials)
@@ -149,10 +154,12 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
     #letterOptions = random.sample(string.ascii_uppercase,numCircles)
     colorOptions = ['Red','Gold','Lime','Fuchsia','Aqua','Coral']
     random.shuffle(colorOptions)
-
     # create letter/masking circle stimuli
     circles = []
     letters = []
+    
+    #Improvised clock
+    trialClock = core.Clock()
     
     # fixed latency: instead of randomly selecting latency set it so
     # the first two circles are always displayed using it
@@ -191,17 +198,16 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
     
     else: ##Experimental Trials
         choiceTime = 'NA'
-        
-        # draw all non-overlapping circles for specified latency time
-        for n in range(fixedLatency):
-            for circle in circles:
-                circle.draw(win)
-            win.flip()
-            for x in range(latency):
-                centerCircle = visual.Circle(win,size=70,units='pix',pos=[0,0],fillColor=colorOptions[1],lineColor=colorOptions[1])
-                centerCircle.draw(win)
-            #win.flip()
-        win.flip()
+        # Working circles with fake latency
+        #for n in range(fixedLatency):
+        #    for circle in circles:
+        #        circle.draw(win)
+        #    win.flip()
+        #    for x in range(latency):
+        #        centerCircle = visual.Circle(win,size=70,units='pix',pos=[0,0],fillColor=colorOptions[1],lineColor=colorOptions[1])
+        #        centerCircle.draw(win)
+        #    #win.flip()
+        #win.flip()
     
         responseClock.reset()
     
@@ -312,4 +318,4 @@ for trialNum,trial in enumerate(experimentalTrials):
     readySequence()
     circlePositions,response,responseTime,choiceTime,confAnswer,colorOptions = presentStimuli(2,trial['askConf'],trial['latency'])
     addTrialVariables()
-    writeToFile(dataFile,trial)
+    #writeToFile(dataFile,trial)
