@@ -193,10 +193,10 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
         if fixedCirclesLatency > latency:
             print("Main circle draws first")
             for n in range(fixedCirclesLatency):
-                if n >= latency:
-                    centerCircle.draw(win)
                 for circle in circles:
                     circle.draw(win)
+                if n >= latency:
+                    centerCircle.draw(win)
                 win.flip()
             centerCircle.draw(win)
             win.flip()
@@ -204,8 +204,9 @@ def presentStimuli(numCircles,askConf,latency='NA',training=False):
         elif fixedCirclesLatency < latency:
             print("Main circle draws second")
             for n in range(latency):
-                for circle in circles:
-                    circle.draw(win)
+                if n <= fixedCirclesLatency:
+                    for circle in circles:
+                        circle.draw(win)
                 win.flip()
             centerCircle.draw(win)
             win.flip()
